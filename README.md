@@ -3,18 +3,18 @@
 ## Getting Started (ngge manusia FE).
 
 ### 1. Setup
-composer install
-cp .env.example .env
-php artisan key:generate
+- composer install
+- cp .env.example .env
+- php artisan key:generate
 
 Generate JWT secret (untuk login):
-php artisan jwt:secret
+- php artisan jwt:secret
 
 Setup Database & Tables:
-   php artisan migrate
+- php artisan migrate
 
 ### 2. Serve
-php artisan serve
+- php artisan serve
 
 ### 3. Dokumentasi API & Cara Pakai
 - **Base URL API**: `http://127.0.0.1:8000/api`
