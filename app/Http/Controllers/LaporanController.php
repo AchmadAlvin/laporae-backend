@@ -16,10 +16,14 @@ class LaporanController extends Controller
 
     public function index()
     {
-        $laporans = Laporan::with('pelapor')->get();
+        $laporans = Laporan::with('pelapor')
+            ->where('pelapor_id', auth('api')->id())
+            ->latest()
+            ->get();
+
         return response()->json([
             'status' => 'success',
-            'data' => $laporans
+            'data'   => $laporans,
         ]);
     }
 
