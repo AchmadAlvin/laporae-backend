@@ -10,10 +10,10 @@ use Illuminate\Routing\Controller;
 
 class AuthController extends Controller
 {
+
     public function __construct()
     {
-        // Login & register bisa diakses tanpa token, yang lain butuh auth:api
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api,admin', ['except' => ['login', 'register']]);
     }
 
     public function login(Request $request)
@@ -25,14 +25,20 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (! $token = auth('api')->attempt($credentials)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
+        // Try login as User
+        if ($token = auth('api')->attempt($credentials)) {
+            return $this->respondWithToken($token, 'api');
         }
 
-        return $this->respondWithToken($token);
+        // Try login as Admin
+        if ($token = auth('admin')->attempt($credentials)) {
+            return $this->respondWithToken($token, 'admin');
+        }
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'Unauthorized',
+        ], 401);
     }
 
     public function register(Request $request)
@@ -73,12 +79,12 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth('api')->user());
+        return response()->json(Auth::user());
     }
 
     public function logout()
     {
-        auth('api')->logout();
+        Auth::logout();
 
         return response()->json([
             'status'  => 'success',
@@ -88,26 +94,36 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        // Refresh token for the current guard
+        return $this->respondWithToken(Auth::refresh(), Auth::guard()->name);
     }
 
-    protected function respondWithToken($token)
+    protected function respondWithToken($token, $guard = null)
     {
-        $user = auth('api')->user();
+        // If guard is not specified, try to determine from auth defaults or current state
+        // But login() calls this explicitly. refresh() calls it with name.
+        
+        $currentGuard = $guard ?: 'api';
+        $user = auth($currentGuard)->user();
+
+        // Handle inconsistent model attributes between User and Admin
+        $name = $user->nama_lengkap ?? $user->nama ?? 'Unknown';
+        $isAdmin = $user->is_admin ?? ($currentGuard === 'admin' ? 1 : 0);
 
         return response()->json([
             'status' => 'success',
             'user'   => [
                 'id'           => $user->id,
-                'nama_lengkap' => $user->nama_lengkap,
+                'nama_lengkap' => $name,
                 'email'        => $user->email,
-                'is_admin'     => (int) $user->is_admin,
+                'is_admin'     => (int) $isAdmin,
             ],
             'authorisation' => [
                 'token'      => $token,
                 'type'       => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
+                'expires_in' => auth($currentGuard)->factory()->getTTL() * 60,
             ],
         ]);
     }
 }
+

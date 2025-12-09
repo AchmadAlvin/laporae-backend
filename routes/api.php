@@ -17,16 +17,22 @@ Route::group([
     Route::post('me',      [AuthController::class, 'me']);
 });
 
+
 Route::group([
     'middleware' => 'auth:api',
 ], function () {
 
     Route::apiResource('laporans', LaporanController::class);
 
-    Route::prefix('admin')->group(function () {
-        Route::get('laporans',        [AdminLaporanController::class, 'index']);
-        Route::get('laporans/{id}',   [AdminLaporanController::class, 'show']);
-        Route::put('laporans/{id}',   [AdminLaporanController::class, 'update']);
-        Route::delete('laporans/{id}',[AdminLaporanController::class, 'destroy']);
-    });
 });
+
+Route::group([
+    'middleware' => 'auth:admin',
+    'prefix' => 'admin'
+], function () {
+    Route::get('laporans',        [AdminLaporanController::class, 'index']);
+    Route::get('laporans/{id}',   [AdminLaporanController::class, 'show']);
+    Route::put('laporans/{id}',   [AdminLaporanController::class, 'update']);
+    Route::delete('laporans/{id}',[AdminLaporanController::class, 'destroy']);
+});
+
