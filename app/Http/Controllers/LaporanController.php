@@ -34,7 +34,7 @@ class LaporanController extends Controller
             'deskripsi' => 'required|string',
             'kategori' => 'required|in:Keamanan,Aksesibilitas,Fasilitas Rusak',
             'lokasi' => 'required|string|max:255',
-            'foto' => 'nullable|image|max:2048',
+            'foto' => 'required|image|max:2048',
         ]);
 
         $fotoPath = null;

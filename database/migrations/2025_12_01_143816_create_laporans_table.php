@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('deskripsi');
             $table->enum('kategori', ['Keamanan', 'Aksesibilitas', 'Fasilitas Rusak']);
             $table->string('lokasi');
-            $table->string('foto')->nullable();
+            $table->string('foto');
             $table->enum('status', ['Baru Masuk', 'Sedang Diverifikasi', 'Selesai Ditindaklanjuti'])->default('Baru Masuk');
             $table->unsignedBigInteger('pelapor_id')->nullable();
             $table->foreign('pelapor_id')->references('id')->on('users')->nullOnDelete();
