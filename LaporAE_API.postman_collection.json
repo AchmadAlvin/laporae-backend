@@ -402,13 +402,13 @@
                             }
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/admin/login",
+                            "raw": "{{base_url}}/api/auth/login",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "admin",
+                                "auth",
                                 "login"
                             ]
                         }
@@ -432,13 +432,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/me",
+                            "raw": "{{base_url}}/api/auth/me",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "admin",
+                                "auth",
                                 "me"
                             ]
                         }
@@ -532,13 +532,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/admin/logout",
+                            "raw": "{{base_url}}/api/auth/logout",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "admin",
+                                "auth",
                                 "logout"
                             ]
                         }
@@ -581,7 +581,7 @@
     "variable": [
         {
             "key": "base_url",
-            "value": "http://127.0.0.1:8000",
+            "value": "http://127.0.0.1:9000",
             "type": "string"
         },
         {
