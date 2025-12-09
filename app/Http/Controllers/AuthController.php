@@ -25,12 +25,10 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        // Try login as User
         if ($token = auth('api')->attempt($credentials)) {
             return $this->respondWithToken($token, 'api');
         }
 
-        // Try login as Admin
         if ($token = auth('admin')->attempt($credentials)) {
             return $this->respondWithToken($token, 'admin');
         }
@@ -47,15 +45,13 @@ class AuthController extends Controller
             'nama_lengkap' => 'required|string|max:255',
             'email'        => 'required|string|email|max:255|unique:users',
             'password'     => 'required|string|min:6',
-            // optional: kalau mau bisa daftar sebagai admin lewat API
-            // 'is_admin'     => 'sometimes|boolean',
+            
         ]);
 
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email'        => $request->email,
             'password'     => Hash::make($request->password),
-            // default 0 (user biasa). Admin bisa kamu set manual di DB / seeder
             'is_admin'     => $request->input('is_admin', 0),
         ]);
 
@@ -94,19 +90,15 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        // Refresh token for the current guard
         return $this->respondWithToken(Auth::refresh(), Auth::guard()->name);
     }
 
     protected function respondWithToken($token, $guard = null)
     {
-        // If guard is not specified, try to determine from auth defaults or current state
-        // But login() calls this explicitly. refresh() calls it with name.
         
         $currentGuard = $guard ?: 'api';
         $user = auth($currentGuard)->user();
 
-        // Handle inconsistent model attributes between User and Admin
         $name = $user->nama_lengkap ?? $user->nama ?? 'Unknown';
         $isAdmin = $user->is_admin ?? ($currentGuard === 'admin' ? 1 : 0);
 
