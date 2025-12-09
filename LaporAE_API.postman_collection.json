@@ -55,6 +55,52 @@
                     "response": []
                 },
                 {
+                    "name": "Register Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.collectionVariables.set(\"admin_token\", jsonData.authorisation.token);"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"nama_lengkap\": \"Admin User\",\n    \"email\": \"admin@laporae.local\",\n    \"password\": \"admin12345\",\n    \"is_admin\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "Login",
                     "event": [
                         {
@@ -79,7 +125,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"budi@email.com\",\n    \"password\": \"Budi123\"\n}",
+                            "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -359,6 +405,65 @@
                                 "api",
                                 "laporans",
                                 "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Laporan (For Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "judul",
+                                    "value": "Lampu Jalan Mati",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "deskripsi",
+                                    "value": "Gelap gulita di malam hari",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "kategori",
+                                    "value": "Keamanan",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lokasi",
+                                    "value": "Jl. Mawar No. 5",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "foto",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/laporans",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "laporans"
                             ]
                         }
                     },

@@ -41,18 +41,43 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $limit = $request->input('is_admin') ? 'admins' : 'users';
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
-            'email'        => 'required|string|email|max:255|unique:users',
+            'email'        => "required|string|email|max:255|unique:$limit",
             'password'     => 'required|string|min:6',
-            
         ]);
+
+        if ($request->input('is_admin')) {
+            $admin = \App\Models\Admin::create([
+                'nama'     => $request->nama_lengkap,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $token = auth('admin')->login($admin);
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Admin created successfully',
+                'user'    => [
+                    'id'           => $admin->id,
+                    'nama_lengkap' => $admin->nama,
+                    'email'        => $admin->email,
+                    'is_admin'     => 1,
+                ],
+                'authorisation' => [
+                    'token' => $token,
+                    'type'  => 'bearer',
+                ],
+            ]);
+        }
 
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email'        => $request->email,
             'password'     => Hash::make($request->password),
-            'is_admin'     => $request->input('is_admin', 0),
+            'is_admin'     => 0,
         ]);
 
         $token = auth('api')->login($user);
@@ -64,7 +89,7 @@ class AuthController extends Controller
                 'id'           => $user->id,
                 'nama_lengkap' => $user->nama_lengkap,
                 'email'        => $user->email,
-                'is_admin'     => (int) $user->is_admin,
+                'is_admin'     => 0,
             ],
             'authorisation' => [
                 'token' => $token,
@@ -90,7 +115,11 @@ class AuthController extends Controller
 
     public function refresh()
     {
-        return $this->respondWithToken(Auth::refresh(), Auth::guard()->name);
+        $guard = 'api';
+        if (Auth::guard('admin')->check()) {
+            $guard = 'admin';
+        }
+        return $this->respondWithToken(Auth::refresh(), $guard);
     }
 
     protected function respondWithToken($token, $guard = null)
